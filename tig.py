@@ -4,9 +4,13 @@
 Usage:
   tig init
   tig commit <msg>
-  tig checkout <rev>
+  tig checkout <rev> [-b <branch-name>]
   tig diff
   tig log
+  tig branch
+
+Options:
+  -b <branch-name>    Branch name to checkout.
 """
 
 import sys
@@ -51,17 +55,41 @@ def __content_from_commit(sha1sum):
 
 def init():
     os.makedirs(".tig/objects")
-    __write_file(".tig/master", "0")
-    __write_file(".tig/head", "0")
+    os.makedirs(".tig/refs/heads")
+    
+    __write_file(".tig/refs/heads/master", "0")
+    __write_file(".tig/head", "ref: refs/heads/master")
+
+
+def __get_branches():
+    return os.listdir(".tig/refs/heads")
+
+
+def __get_current_branch():
+    head_rev = __read_file(".tig/head")
+    if head_rev[:4] != "ref:":
+        return None
+
+    branch_path = head_rev[4:].strip()
+    branch_name = os.path.basename(branch_path)
+
+    return branch_name
+
+
+def branch():
+    current = __get_current_branch()
+    for branch in sorted(__get_branches()):
+        star = "*" if branch == current else " "
+        print "{0}{1}".format(star, branch)
 
 
 def commit(msg):
-    master_rev = __read_file(".tig/master")
-    head_rev = __read_file(".tig/head")
-
-    if master_rev != head_rev:
-        print "tig: not in head revision"
+    branch = __get_current_branch()
+    if branch == None:
+        print "tig: not at tip"
         return
+
+    master_rev = __read_file(".tig/refs/heads/{0}".format(branch))
 
     sha1sum_content = __storedb(__read_file("file.txt"))
     sha1sum_commit = __storedb(json.dumps({
@@ -72,21 +100,31 @@ def commit(msg):
         "time": int(time.time())
     }, indent=4))
 
-    __write_file(".tig/master", sha1sum_commit)
-    __write_file(".tig/head", sha1sum_commit)
+    __write_file(".tig/refs/heads/{0}".format(branch), sha1sum_commit)
     print sha1sum_commit
 
 
-def checkout(rev):
+def checkout(rev, branch):
     content_sha1sum = __content_from_commit(rev)
     content = __getdb(content_sha1sum)
     
     __write_file("file.txt", content)
-    __write_file(".tig/head", rev)
 
+    if branch is None:
+        __write_file(".tig/head", rev)
+    else:
+        __write_file(".tig/refs/heads/{0}".format(branch), rev)
+        __write_file(".tig/head", "ref: refs/heads/{0}".format(branch))
+        
 
 def diff():
-    head_rev = __content_from_commit(__read_file(".tig/head"))
+    branch = __get_current_branch()
+    if branch == None:
+        commit_sha1sum = __read_file(".tig/head")
+    else:
+        commit_sha1sum = __read_file(".tig/refs/heads/{0}".format(branch))
+
+    head_rev = __content_from_commit(commit_sha1sum)
 
     with open(".tig/objects/{0}".format(head_rev), "r") as orig_file:
         orig_content = orig_file.readlines()
@@ -99,7 +137,11 @@ def diff():
 
 
 def log():
-    commit_sha1sum = __read_file(".tig/head")
+    branch = __get_current_branch()
+    if branch == None:
+        commit_sha1sum = __read_file(".tig/head")
+    else:
+        commit_sha1sum = __read_file(".tig/refs/heads/{0}".format(branch))
     
     while True:
         commit = json.loads(__getdb(commit_sha1sum))
@@ -114,13 +156,15 @@ def main():
     if args["commit"]:
         commit(args["<msg>"])
     elif args["checkout"]:
-        checkout(args["<rev>"])
+        checkout(args["<rev>"], args["-b"])
     elif args["init"]:
         init()
     elif args["diff"]:
         diff()
     elif args["log"]:
         log()
+    elif args["branch"]:
+        branch()
     else:
         # Not reached
         pass
