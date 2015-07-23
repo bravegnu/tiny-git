@@ -1,4 +1,155 @@
-= Tiny Git
+= Building Git From Scratch
+Vijay Kumar <vijaykumar@bravegnu.org>
 
-This is a tiny implementation of Git in Python, to understand and
-demonstrate how Git works.
+== Demo: Tiny Git
+
+  * Creating a repository
+  * Commiting changes
+  * Viewing changes in workking copy
+  * Viewing change history
+  * Creating branches
+  * Switching branches
+  * Merging changes from branches
+
+== Limitations
+
+  * Tracks only a single file
+  * Merge handling is not completely implemented
+  * Push and pull from remote repository is not supported
+
+== V0: The Skeleton
+
+  * Use docopt to parse the command line arguments.
+  * Usage information is used to parsing
+
+== How to Store Files: Take 1
+
+  * `.tig/objects` holds revisions of the file.
+  * `.tig/master` contains the latest revision filename: `file.txt.v3`
+
+------
+proj/
+  + .tig/
+  |  + objects/
+  |  | + file.txt.v1
+  |  | + file.txt.v2
+  |  | + file.txt.v3
+  |  + master
+  |
+  + file.txt
+------
+
+  * Commit
+    1. Get the current revision from `.tig/master`
+    2. Increment that by 1: 3 -> 4.
+    3. Copy `file.txt` to `.tig/objects/file.txt.v4`
+    4. Set `.tig/master` to `file.txt.v4`
+
+  * Checkout
+    1. Get lastest revision from `.tig/master`
+    2. Copy `.tig/objects/file.txt.v4` to `file.txt`
+
+== DVCS and Seq. Versioning
+
+  * File is created called `file.txt.v1`
+  * User A takes a copy modifies it and creates `file.txt.v2`
+  * User B takes a copy modifies it differently and creates `file.txt.v2`
+  * Which is v2?
+  * Distributed version control system, sequential version no. does
+    not work.
+
+== Use SHA1 to Identify the File
+
+  * Indentify files by the SHA1 of their content.
+  * File is created called `4c7be7...`
+  * User A takes a copy modifies it and creates `c9360f...`
+  * User B takes a copy modifies it differently and creates `da39a3..`
+
+== How to store Files: Take 2
+
+------
+proj/
+  + .tig/
+  |  + objects/
+  |  | + 4c7be7b2c3641a5e489c4ce667699eeee4e994c9
+  |  | + c9360f5cd3d2c9f5656cd5ee10dedd3d235a4e0f
+  |  | + da39a3ee5e6b4b0d3255bfef95601890afd80709
+  |  + master
+  |
+  + file.txt
+-----
+
+  * Commit
+    1. Find SHA1 of `file.txt`: `58f3966...`
+    2. Store `file.txt` to `.tig/objects/58f3966...`
+    3. Set `.tig/master` to `58f3966...`
+
+  * Checkout
+    1. Get lastest revision from `.tig/master`
+    2. Copy `.tig/objects/58f3966...` to `file.txt`
+
+== Ordering Lost
+
+  * The latest revision is in `.tig/master`
+  * The previous revision is not known!
+  * No meta information about the changes: who? why? when?
++
+image::no-commit-objects.png[]
+
+
+== Ordering Regained
+
+  * Commit object: meta information stored in the object database.
+  * Stores SHA1 of `file.txt` that corresponds to this commit.
+  * Stores SHA1 of parent commit.
++
+image::commit-objects.png[]
++
+  * Stores log message, author, and time information as well.
+
+== Ordering Regained (Contd.)
+
+  * Commit
+    1. Find SHA1 of `file.txt`: `58f3966...`
+    2. Store `file.txt` to `.tig/objects/58f3966...`
+    3. Create and store commit object: `8fb439...`
+    4. Set `.tig/master` to commit object
+
+  * Checkout
+    1. Get lastest commit object from `.tig/master`: `8fb439...`
+    2. Get content SHA1 from commit object: `58f3966...`
+    3. Copy it to `file.txt`
+
+  * Log
+    1. Get lastest commit object from `.tig/master`: `8fb439...`
+    2. Print the commit info
+    3. Get the parent commit
+    4. Print the commit info
+    5. ... Repeat ...
+
+== Checkout Any Version
+
+  * `.tig/master`: the latest version of the file.
+  * `.tig/HEAD`: the current checked out version.
+  * Commits not allowed if not latest version
+
+------
+proj/
+  + .tig/
+  |  + objects/
+  |  | + 4c7be7b2c3641a5e489c4ce667699eeee4e994c9
+  |  | + c9360f5cd3d2c9f5656cd5ee10dedd3d235a4e0f
+  |  | + da39a3ee5e6b4b0d3255bfef95601890afd80709
+  |  + master
+  |  + HEAD
+  |
+  + file.txt
+-----
+
+== V2: Creating and Listing Branches
+
+TBD
+
+== V3: Merging Changes
+
+TBD
