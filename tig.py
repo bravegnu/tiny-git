@@ -4,7 +4,7 @@
 Usage:
   tig init
   tig commit <msg>
-  tig checkout <rev> [-b <branch-name>]
+  tig checkout <start-point> [-b <branch-name>]
   tig diff
   tig log
   tig branch
@@ -104,17 +104,32 @@ def commit(msg):
     print sha1sum_commit
 
 
-def checkout(rev, branch):
-    content_sha1sum = __content_from_commit(rev)
+def __is_branch(start_point):
+    return start_point in __get_branches()
+
+
+def __commit_from_start_point(start_point):
+    if __is_branch(start_point):
+        return __read_file(".tig/refs/heads/{0}".format(start_point))
+
+    return start_point
+
+
+def checkout(start_point, new_branch):
+    commit_sha1sum = __commit_from_start_point(start_point)
+    content_sha1sum = __content_from_commit(commit_sha1sum)
     content = __getdb(content_sha1sum)
     
     __write_file("file.txt", content)
 
-    if branch is None:
-        __write_file(".tig/head", rev)
+    if new_branch is None:
+        if __is_branch(start_point):
+            __write_file(".tig/head", "ref: refs/heads/{0}".format(start_point))
+        else:
+            __write_file(".tig/head", start_point)
     else:
-        __write_file(".tig/refs/heads/{0}".format(branch), rev)
-        __write_file(".tig/head", "ref: refs/heads/{0}".format(branch))
+        __write_file(".tig/refs/heads/{0}".format(new_branch), commit_sha1sum)
+        __write_file(".tig/head", "ref: refs/heads/{0}".format(new_branch))
         
 
 def diff():
@@ -156,7 +171,7 @@ def main():
     if args["commit"]:
         commit(args["<msg>"])
     elif args["checkout"]:
-        checkout(args["<rev>"], args["-b"])
+        checkout(args["<start-point>"], args["-b"])
     elif args["init"]:
         init()
     elif args["diff"]:
