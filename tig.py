@@ -59,13 +59,13 @@ def __get_branches():
 
 def __set_head(rev):
     if rev in __get_branches():
-        __write_file(".tig/head", "ref: refs/heads/{0}".format(rev))
+        __write_file(".tig/HEAD", "ref: refs/heads/{0}".format(rev))
     else:
-        __write_file(".tig/head", rev)
+        __write_file(".tig/HEAD", rev)
 
 
 def __get_current_branch():
-    head_rev = __read_file(".tig/head")
+    head_rev = __read_file(".tig/HEAD")
     if head_rev[:4] != "ref:":
         return None
 
@@ -78,7 +78,7 @@ def __get_current_branch():
 def __get_head_commit():
     branch = __get_current_branch()
     if branch == None:
-        return __read_file(".tig/head")
+        return __read_file(".tig/HEAD")
     else:
         return __read_file(".tig/refs/heads/{0}".format(branch))
 
@@ -95,7 +95,7 @@ def init():
     os.makedirs(".tig/objects")
     os.makedirs(".tig/refs/heads")
     
-    __write_file(".tig/refs/heads/master", "0")
+    __set_branch_commit("master", "0")
     __set_head("master")
 
 
