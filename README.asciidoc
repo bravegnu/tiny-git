@@ -144,7 +144,7 @@ proj/
   |  + HEAD
   |
   + file.txt
------
+------
 
 == V2: Creating and Listing Branches
 
