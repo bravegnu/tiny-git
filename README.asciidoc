@@ -1,0 +1,4 @@
+= Tiny Git
+
+This is a tiny implementation of Git in Python, to understand and
+demonstrate how Git works.
