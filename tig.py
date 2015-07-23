@@ -154,13 +154,13 @@ def checkout(start_point, new_branch):
 
 def diff():
     commit_sha1sum = __get_head_commit()
-    head_rev = __content_from_commit(commit_sha1sum)
+    content_sha1sum = __content_from_commit(commit_sha1sum)
 
-    with open(".tig/objects/{0}".format(head_rev), "r") as orig_file:
-        orig_content = orig_file.readlines()
-    
-    with open("file.txt", "r") as curr_file:
-        curr_content = curr_file.readlines()
+    orig_content = __getdb(content_sha1sum)
+    orig_content = orig_content.splitlines(True)
+
+    curr_content = __read_file("file.txt")
+    curr_content = curr_content.splitlines(True)
         
     lines = difflib.unified_diff(orig_content, curr_content, "a/file.txt", "b/file.txt")
     print("".join(lines))
