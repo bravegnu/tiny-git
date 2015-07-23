@@ -77,7 +77,7 @@ proj/
   |  + master
   |
   + file.txt
------
+------
 
   * Commit
     1. Find SHA1 of `file.txt`: `58f3966...`
