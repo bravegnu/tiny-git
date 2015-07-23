@@ -8,6 +8,7 @@ Usage:
   tig diff
   tig log
   tig branch
+  tig merge <branch>
 
 Options:
   -b <branch-name>    Branch name to checkout.
@@ -21,6 +22,8 @@ import difflib
 import hashlib
 import json
 import time
+import tempfile
+import subprocess
 
 
 def __sha1(content):
@@ -106,6 +109,17 @@ def branch():
         print "{0}{1}".format(star, branch)
 
 
+def __create_commit(content_sha1sum, parents, msg):
+    sha1sum_commit = __storedb(json.dumps({
+        "content": content_sha1sum,
+        "parent": parents,
+        "log-msg": msg,
+        "author": os.getenv("USER"),
+        "time": int(time.time())
+    }, indent=4))
+    return sha1sum_commit
+
+
 def commit(msg):
     branch = __get_current_branch()
     if branch == None:
@@ -113,17 +127,10 @@ def commit(msg):
         return
 
     master_rev = __get_branch_commit(branch)
-
     sha1sum_content = __storedb(__read_file("file.txt"))
-    sha1sum_commit = __storedb(json.dumps({
-        "content": sha1sum_content,
-        "parent": master_rev,        
-        "log-msg": msg,
-        "author": os.getenv("USER"),
-        "time": int(time.time())
-    }, indent=4))
-
+    sha1sum_commit = __create_commit(sha1sum_content, [master_rev], msg)
     __set_branch_commit(branch, sha1sum_commit)
+
     print sha1sum_commit
 
 
@@ -138,12 +145,16 @@ def __commit_from_start_point(start_point):
     return start_point
 
 
-def checkout(start_point, new_branch):
+def __update_working_copy(start_point):
     commit_sha1sum = __commit_from_start_point(start_point)
     content_sha1sum = __content_from_commit(commit_sha1sum)
     content = __getdb(content_sha1sum)
     
     __write_file("file.txt", content)
+    return commit_sha1sum
+
+def checkout(start_point, new_branch):
+    commit_sha1sum = __update_working_copy(start_point)
 
     if new_branch is None:
         __set_head(start_point)
@@ -172,9 +183,96 @@ def log():
     while True:
         commit = json.loads(__getdb(commit_sha1sum))
         print commit_sha1sum[:6], commit["log-msg"]
-        commit_sha1sum = commit["parent"]
+        commit_sha1sum = commit["parent"][0]
         if commit_sha1sum == "0":
             break
+
+
+def __get_common_ancestor(commit1, commit2):
+    if commit1 == commit2:
+        return
+
+    ancestors1 = [commit1]
+    ancestors2 = [commit2]
+
+    while True:
+        commit_obj = json.loads(__getdb(commit1))
+        parent_commit = commit_obj["parent"][0]
+        if parent_commit in ancestors2:
+            return parent_commit
+
+        ancestors1.append(parent_commit)
+        commit1 = parent_commit
+
+        commit_obj = json.loads(__getdb(commit2))
+        parent_commit = commit_obj["parent"][0]
+        if parent_commit in ancestors1:
+            return parent_commit
+
+        ancestors2.append(parent_commit)
+        commit2 = parent_commit
+
+    return None
+
+
+def __diff3(mine_sha1sum, orig_sha1sum, your_sha1sum):
+    tmpdir = tempfile.mkdtemp()
+
+    diff3_files = [("mine", mine_sha1sum),
+                   ("orig", orig_sha1sum),
+                   ("your", your_sha1sum)]
+
+    for filename, sha1sum in diff3_files:
+        path = os.path.join(tmpdir, filename)
+        content_sha1sum = __content_from_commit(sha1sum)
+        __write_file(path, __getdb(content_sha1sum))
+
+    conflicted = False
+    merged_path = os.path.join(tmpdir, "merged")
+    with open(merged_path, "w") as merged_file:
+        ret = subprocess.call(["diff3", "-A", "-m", "mine", "orig", "your"],
+                              cwd=tmpdir, stdout=merged_file)
+        if ret != 0:
+            conflicted = True
+
+    return __read_file(os.path.join(merged_path)), conflicted
+
+
+def merge(branch):
+    mine_sha1sum = __get_head_commit()
+    your_sha1sum = __get_branch_commit(branch)
+
+    ca_sha1sum = __get_common_ancestor(mine_sha1sum, your_sha1sum)
+    if not ca_sha1sum:
+        print "tig: failed to find common ancestor"
+        return
+
+    if ca_sha1sum == your_sha1sum:
+        print "tig: up-to-date"
+        return
+
+    if ca_sha1sum == mine_sha1sum:
+        print "tig: fast-forward merge"
+        mine_branch = __get_current_branch()
+        __set_branch_commit(mine_branch, your_sha1sum)
+        __update_working_copy(mine_branch)
+        return
+
+    # True Merge
+    merged, conflicted = __diff3(mine_sha1sum, ca_sha1sum, your_sha1sum)
+    __write_file("file.txt", merged)
+
+    if not conflicted:
+        content_sha1sum = __storedb(merged)
+        commit_sha1sum = __create_commit(content_sha1sum,
+                                         [mine_sha1sum, your_sha1sum],
+                                         "Merged changes from '{0}'".format(branch))
+        mine_branch = __get_current_branch()
+        __set_branch_commit(mine_branch, commit_sha1sum)
+        print commit_sha1sum
+    else:
+        # FIXME: This needs to be handled.
+        print "tig: merge conflict occurred"
 
 
 def main():
@@ -191,6 +289,8 @@ def main():
         log()
     elif args["branch"]:
         branch()
+    elif args["merge"]:
+        merge(args["<branch>"])
     else:
         # Not reached
         pass

@@ -4,3 +4,6 @@
 ./test-branch.sh
 ./test-branch-commit.sh
 ./test-branch-switch.sh
+./test-merge.sh
+./test-merge-up-to-date.sh
+./test-merge-fast-forward.sh
