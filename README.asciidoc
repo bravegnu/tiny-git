@@ -22,6 +22,13 @@ Vijay Kumar <vijaykumar@bravegnu.org>
   * Use docopt to parse the command line arguments.
   * Usage information is used to parsing
 
+== V1: Features
+
+  * Create Repo
+  * Commit
+  * Checkout
+  * No Branching
+
 == How to Store Files: Take 1
 
   * `.tig/objects` holds revisions of the file.
@@ -162,6 +169,11 @@ proj/
     4. Create and store commit object: `8fb439...`
     5. Set `.tig/master` to commit object
 
+== V2: Features
+
+  * Support for branching
+  * No merging
+
 == Branches
 
   * Only one branch so far: `master` 
@@ -226,6 +238,7 @@ proj/
     4. Create and store commit object: `8fb439...`
     5. Set `ref: refs/heads/your-branch` to commit object
     
-== V3: Merging Changes
+== V3: Features
 
-TBD
+  * Support for simple merge
+  * Merge conflicts not supported
