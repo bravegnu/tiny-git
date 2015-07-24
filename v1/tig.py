@@ -61,10 +61,7 @@ def __set_head(rev):
 
 
 def __get_head_commit():
-    if __read_file(".tig/HEAD") == "master":
-        return __read_file(".tig/master")
-    else:
-        return __read_file(".tig/HEAD")
+    return __read_file(".tig/HEAD")
 
 
 def __set_master_commit(commit_sha1sum):
@@ -80,7 +77,7 @@ def init():
     os.makedirs(".tig/refs/heads")
     
     __set_master_commit("0")
-    __set_head("master")
+    __set_head("0")
 
 
 def branch():
@@ -107,6 +104,7 @@ def commit(msg):
     sha1sum_content = __storedb(__read_file("file.txt"))
     sha1sum_commit = __create_commit(sha1sum_content, [master_rev], msg)
     __set_master_commit(sha1sum_commit)
+    __set_head(sha1sum_commit)
 
     print sha1sum_commit
 
@@ -119,6 +117,9 @@ def __update_working_copy(start_point):
 
 
 def checkout(start_point, new_branch):
+    if start_point == "master":
+        start_point = __get_master_commit()
+
     __update_working_copy(start_point)
     __set_head(start_point)
         
