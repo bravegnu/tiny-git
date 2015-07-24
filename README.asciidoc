@@ -96,7 +96,6 @@ proj/
 +
 image::docs/no-commit-objects.png[]
 
-
 == Ordering Regained
 
   * Commit object: meta information stored in the object database.
@@ -146,10 +145,87 @@ proj/
   + file.txt
 ------
 
-== V2: Creating and Listing Branches
+== Checkout Any Version (Contd.)
 
-TBD
+  * Checkout
+    1. Determine the commit SHA1.
+       a. *If SHA1 specified, use it.*
+       b. If not specifed get lastest commit object from `.tig/master`
+    2. Get content SHA1 from commit object.
+    3. Copy it to `file.txt`
+    4. *Set `HEAD` to checked-out commit SHA1.*
 
+  * Commit
+    1. *If `HEAD` != `master`, cannot commit*.
+    2. Find SHA1 of `file.txt`: `58f3966...`
+    3. Store `file.txt` to `.tig/objects/58f3966...`
+    4. Create and store commit object: `8fb439...`
+    5. Set `.tig/master` to commit object
+
+== Branches
+
+  * Only one branch so far: `master` 
++
+------
+o---o---o---o---o master
+------
++
+  * Each branch has it's own series of commits.
++
+------
+o---o---o---o---o  master
+    \
+     ---o---o  2.0-dev
+------
+
+== Repository Format
+
+  * `.tig/refs/heads`: contains one file per branch
+  * Name of the file, corresponds to named of the branch
+  * Just like `master` contains the SHA1 of the latest commit in the branch
+
+  * `.tig/HEAD`:
+    - Contains SHA1 if checkout done by SHA1
+    - Contains the branch name if checkout done by branch name.
+      Example: `ref: refs/heads/master`
+
+------
+proj/
+  + .tig/
+  |  + objects/
+  |  | + 4c7be7b2c3641a5e489c4ce667699eeee4e994c9
+  |  | + ...
+  |  + refs/
+  |    + heads/
+  |      + master
+  |      + 2.0-dev
+  |  + HEAD
+  |
+  + file.txt
+------
+
+== Branch Operations
+
+  * Create Branch at commit 
+    1. Store commit SHA1 in `ref: refs/heads/master`
+
+  * Checkout
+    1. Determine the commit SHA1:
+       a. If SHA1 specified, use it.
+       b. *If branch specified, get SHA1 from `ref: refs/heads/your-branch`*
+    2. Get content SHA1 from commit object.
+    3. Copy it to `file.txt`
+    4. Set `HEAD`:
+       a. If checkout using SHA1, set to SHA1
+       b. *If checkout using branch name, set to `ref: refs/heads/your-branch`*
+
+  * Commit
+    1. *If `HEAD` does correspond to a branch, cannot commit*.
+    2. Find SHA1 of `file.txt`: `58f3966...`
+    3. Store `file.txt` to `.tig/objects/58f3966...`
+    4. Create and store commit object: `8fb439...`
+    5. Set `ref: refs/heads/your-branch` to commit object
+    
 == V3: Merging Changes
 
 TBD
