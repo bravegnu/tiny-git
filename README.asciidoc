@@ -94,7 +94,7 @@ proj/
   * The previous revision is not known!
   * No meta information about the changes: who? why? when?
 +
-image::no-commit-objects.png[]
+image::docs/no-commit-objects.png[]
 
 
 == Ordering Regained
@@ -103,7 +103,7 @@ image::no-commit-objects.png[]
   * Stores SHA1 of `file.txt` that corresponds to this commit.
   * Stores SHA1 of parent commit.
 +
-image::commit-objects.png[]
+image::docs/commit-objects.png[]
 +
   * Stores log message, author, and time information as well.
 
