@@ -1,9 +1,8 @@
 = Tiny Git
 
 A tiny model of Git, used for learning and demonstrating how Git
-works. A series of version of Tiny Git is available, in increasing
-order of complexity. The list of versions and their features is listed
-below.
+works. A series of models is available, in increasing order of
+complexity. The list of versions and their features is listed below.
 
 [options="header"]
 |======
