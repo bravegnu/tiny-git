@@ -47,6 +47,9 @@ def merge(branch):
 
 def main():
     args = docopt.docopt(__doc__)
+    
+    print args
+    
     if args["commit"]:
         commit(args["<msg>"])
     elif args["checkout"]:
