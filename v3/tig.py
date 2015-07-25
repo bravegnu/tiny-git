@@ -56,57 +56,32 @@ def __content_from_commit(sha1sum):
     return json.loads(__getdb(sha1sum))["content"]
 
 
-def __get_branches():
-    return os.listdir(".tig/refs/heads")
-
-
 def __set_head(rev):
-    if rev in __get_branches():
-        __write_file(".tig/HEAD", "ref: refs/heads/{0}".format(rev))
-    else:
-        __write_file(".tig/HEAD", rev)
-
-
-def __get_current_branch():
-    head_rev = __read_file(".tig/HEAD")
-    if head_rev[:4] != "ref:":
-        return None
-
-    branch_path = head_rev[4:].strip()
-    branch_name = os.path.basename(branch_path)
-
-    return branch_name
+    __write_file(".tig/HEAD", rev)
 
 
 def __get_head_commit():
-    branch = __get_current_branch()
-    if branch == None:
-        return __read_file(".tig/HEAD")
-    else:
-        return __read_file(".tig/refs/heads/{0}".format(branch))
+    return __read_file(".tig/HEAD")
 
 
-def __set_branch_commit(branch, commit_sha1sum):
-    __write_file(".tig/refs/heads/{0}".format(branch), commit_sha1sum)
+def __set_master_commit(commit_sha1sum):
+    __write_file(".tig/master", commit_sha1sum)
 
 
-def __get_branch_commit(branch):
-    return __read_file(".tig/refs/heads/{0}".format(branch))
+def __get_master_commit():
+    return __read_file(".tig/master")
 
 
 def init():
     os.makedirs(".tig/objects")
     os.makedirs(".tig/refs/heads")
     
-    __set_branch_commit("master", "0")
-    __set_head("master")
+    __set_master_commit("0")
+    __set_head("0")
 
 
 def branch():
-    current = __get_current_branch()
-    for branch in sorted(__get_branches()):
-        star = "*" if branch == current else " "
-        print "{0}{1}".format(star, branch)
+    pass
 
 
 def __create_commit(content_sha1sum, parents, msg):
@@ -121,46 +96,32 @@ def __create_commit(content_sha1sum, parents, msg):
 
 
 def commit(msg):
-    branch = __get_current_branch()
-    if branch == None:
+    if __get_head_commit() != __get_master_commit():
         print "tig: not at tip"
         return
 
-    master_rev = __get_branch_commit(branch)
+    master_rev = __get_master_commit()
     sha1sum_content = __storedb(__read_file("file.txt"))
     sha1sum_commit = __create_commit(sha1sum_content, [master_rev], msg)
-    __set_branch_commit(branch, sha1sum_commit)
+    __set_master_commit(sha1sum_commit)
+    __set_head(sha1sum_commit)
 
     print sha1sum_commit
 
 
-def __is_branch(start_point):
-    return start_point in __get_branches()
-
-
-def __commit_from_start_point(start_point):
-    if __is_branch(start_point):
-        return __get_branch_commit(start_point)
-
-    return start_point
-
-
 def __update_working_copy(start_point):
-    commit_sha1sum = __commit_from_start_point(start_point)
-    content_sha1sum = __content_from_commit(commit_sha1sum)
+    content_sha1sum = __content_from_commit(start_point)
     content = __getdb(content_sha1sum)
     
     __write_file("file.txt", content)
-    return commit_sha1sum
+
 
 def checkout(start_point, new_branch):
-    commit_sha1sum = __update_working_copy(start_point)
+    if start_point == "master":
+        start_point = __get_master_commit()
 
-    if new_branch is None:
-        __set_head(start_point)
-    else:
-        __set_branch_commit(new_branch, commit_sha1sum)
-        __set_head(new_branch)
+    __update_working_copy(start_point)
+    __set_head(start_point)
         
 
 def diff():

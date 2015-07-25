@@ -124,22 +124,35 @@ image::docs/no-commit-objects.png[]
   * Commit
   * Checkout
   * Diff
-  * Log
+  * *Log*
 
 === Limitations
 
   * Checkout only latest revision
   * No branching
 
-== Ordering Regained
+== Commit Objects
 
   * Commit object: meta information stored in the object database.
+
+------
+{
+        "log-msg": "Added goodbye world",
+        "author": "vijaykumar@bravegnu.org",
+        "time": 1437790070,
+
+        "content": eb12bc...,
+        "parent": ef4d3e...,
+}
+------
+
+  * Stores log message, author, and time information as well.
   * Stores SHA1 of `file.txt` that corresponds to this commit.
   * Stores SHA1 of parent commit.
-+
+
+== Ordering Regained
+
 image::docs/commit-objects.png[]
-+
-  * Stores log message, author, and time information as well.
 
 == Ordering Regained (Contd.)
 
@@ -160,6 +173,18 @@ image::docs/commit-objects.png[]
     3. Get the parent commit
     4. Print the commit info
     5. ... Repeat ...
+
+== V3: Features
+
+  * Create Repo
+  * Commit
+  * *Checkout (any version)*
+  * Diff
+  * Log
+
+=== Limitations
+
+  * No branching
 
 == Checkout Any Version
 
@@ -197,7 +222,7 @@ proj/
     4. Create and store commit object: `8fb439...`
     5. Set `.tig/master` to commit object
 
-== V3: Features
+== V4: Features
 
   * Support for branching
   * No merging
@@ -266,7 +291,7 @@ proj/
     4. Create and store commit object: `8fb439...`
     5. Set `ref: refs/heads/your-branch` to commit object
     
-== V3: Features
+== V5: Features
 
   * Support for simple merge
   * Merge conflicts not supported
