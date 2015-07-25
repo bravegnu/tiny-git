@@ -1,297 +1,47 @@
-= Building Git From Scratch
-Vijay Kumar <vijaykumar@bravegnu.org>
+= Tiny Git
 
-== Demo: Tiny Git
+A tiny model of Git, used for learning and demonstrating how Git
+works. A series of version of Tiny Git is available, in increasing
+order of complexity. The list of versions and their features is listed
+below.
 
-  * Creating a repository
-  * Commiting changes
-  * Viewing changes in workking copy
-  * Viewing change history
-  * Creating branches
-  * Switching branches
-  * Merging changes from branches
+[options="header"]
+|======
+| Version	| Description
+| v0		| Only argument parsing
+| v1		| Implements single file commits without history tracking
+| v2		| Adds support for history tracking and logs
+| v3		| Adds support for checking-out older revisions
+| v4		| Adds support for creating branching
+| v5		| Adds support for merging changes
+|======
 
-=== Limitations
+== Usage
 
-  * Tracks only a single file
-  * Merge handling is not completely implemented
-  * Push and pull from remote repository is not supported
-
-== V0: The Skeleton
-
-image::docs/docopt.png[]
-
-  * All command line tools need to parse arguments.
-  * Docopt considerably reduces the code for argument parsing.
-  * From the command help message, Docopt figures out
-    - sub-commands
-    - options
-    - positional arguments
-  * Provides parsed result in a dictionary.
-
-== V1: Features
-
-  * Create Repo
-  * Commit
-  * Checkout
-  * Diff
-
-=== Limitations
-
-  * Checkout only latest revision
-  * No logs
-  * No branching
-
-== How to Store Files: Take 1
-
-  * `.tig/objects` holds revisions of the file.
-  * `.tig/master` contains the latest revision filename: `file.txt.v3`
+The first step is to activate a particular version of Tiny Git. From
+the top level directory of the project source `activate` and specify
+the version no. to activate. For example, to activate version `v5`,
+the following command can be used.
 
 ------
-proj/
-  + .tig/
-  |  + objects/
-  |  | + file.txt.v1
-  |  | + file.txt.v2
-  |  | + file.txt.v3
-  |  + master
-  |
-  + file.txt
+$ source activate v5
 ------
 
-  * Commit
-    1. Get the current revision from `.tig/master`
-    2. Increment that by 1: 3 -> 4.
-    3. Copy `file.txt` to `.tig/objects/file.txt.v4`
-    4. Set `.tig/master` to `file.txt.v4`
-
-== How to Store Files: Take 1 (Contd.)
-
-  * Checkout
-    1. Get lastest revision from `.tig/master`
-    2. Copy `.tig/objects/file.txt.v4` to `file.txt`
-
-== DVCS and Seq. Versioning
-
-  * File is created called `file.txt.v1`
-  * User A takes a copy modifies it and creates `file.txt.v2`
-  * User B takes a copy modifies it differently and creates `file.txt.v2`
-  * Which is v2?
-  * Distributed version control system, sequential version no. does
-    not work.
-
-== Use SHA1 to Identify the File
-
-  * Indentify files by the SHA1 of their content.
-  * File is created called `4c7be7...`
-  * User A takes a copy modifies it and creates `c9360f...`
-  * User B takes a copy modifies it differently and creates `da39a3..`
-
-== How to store Files: Take 2
+Type `tig` to get the available list of sub-commands.
 
 ------
-proj/
-  + .tig/
-  |  + objects/
-  |  | + 4c7be7b2c3641a5e489c4ce667699eeee4e994c9
-  |  | + c9360f5cd3d2c9f5656cd5ee10dedd3d235a4e0f
-  |  | + da39a3ee5e6b4b0d3255bfef95601890afd80709
-  |  + master
-  |
-  + file.txt
-------
+$ tig
+Usage:
+  tig init
+  tig commit <msg>
+  tig checkout <start-point> [-b <branch-name>]
+  tig diff
+  tig log
+  tig branch
+  tig merge <branch>
+-----
 
-  * Commit
-    1. Find SHA1 of `file.txt`: `58f3966...`
-    2. Store `file.txt` to `.tig/objects/58f3966...`
-    3. Set `.tig/master` to `58f3966...`
+== Slides: Building Git From Scratch
 
-  * Checkout
-    1. Get lastest revision from `.tig/master`
-    2. Copy `.tig/objects/58f3966...` to `file.txt`
-
-== Ordering Lost
-
-  * The latest revision is in `.tig/master`
-  * The previous revision is not known!
-  * No meta information about the changes: who? why? when?
-+
-image::docs/no-commit-objects.png[]
-
-== V2: Features
-
-  * Create Repo
-  * Commit
-  * Checkout
-  * Diff
-  * *Log*
-
-=== Limitations
-
-  * Checkout only latest revision
-  * No branching
-
-== Commit Objects
-
-  * Commit object: meta information stored in the object database.
-
-------
-{
-        "log-msg": "Added goodbye world",
-        "author": "vijaykumar@bravegnu.org",
-        "time": 1437790070,
-
-        "content": eb12bc...,
-        "parent": ef4d3e...,
-}
-------
-
-  * Stores log message, author, and time information as well.
-  * Stores SHA1 of `file.txt` that corresponds to this commit.
-  * Stores SHA1 of parent commit.
-
-== Ordering Regained
-
-image::docs/commit-objects.png[]
-
-== Ordering Regained (Contd.)
-
-  * Commit
-    1. Find SHA1 of `file.txt`: `58f3966...`
-    2. Store `file.txt` to `.tig/objects/58f3966...`
-    3. Create and store commit object: `8fb439...`
-    4. Set `.tig/master` to commit object
-
-  * Checkout
-    1. Get lastest commit object from `.tig/master`: `8fb439...`
-    2. Get content SHA1 from commit object: `58f3966...`
-    3. Copy it to `file.txt`
-
-  * Log
-    1. Get lastest commit object from `.tig/master`: `8fb439...`
-    2. Print the commit info
-    3. Get the parent commit
-    4. Print the commit info
-    5. ... Repeat ...
-
-== V3: Features
-
-  * Create Repo
-  * Commit
-  * *Checkout (any version)*
-  * Diff
-  * Log
-
-=== Limitations
-
-  * No branching
-
-== Checkout Any Version
-
-  * `.tig/master`: the latest version of the file.
-  * `.tig/HEAD`: the current checked out version.
-  * Commits not allowed if not latest version
-
-------
-proj/
-  + .tig/
-  |  + objects/
-  |  | + 4c7be7b2c3641a5e489c4ce667699eeee4e994c9
-  |  | + c9360f5cd3d2c9f5656cd5ee10dedd3d235a4e0f
-  |  | + da39a3ee5e6b4b0d3255bfef95601890afd80709
-  |  + master
-  |  + HEAD
-  |
-  + file.txt
-------
-
-== Checkout Any Version (Contd.)
-
-  * Checkout
-    1. Determine the commit SHA1.
-       a. *If SHA1 specified, use it.*
-       b. If not specifed get lastest commit object from `.tig/master`
-    2. Get content SHA1 from commit object.
-    3. Copy it to `file.txt`
-    4. *Set `HEAD` to checked-out commit SHA1.*
-
-  * Commit
-    1. *If `HEAD` != `master`, cannot commit*.
-    2. Find SHA1 of `file.txt`: `58f3966...`
-    3. Store `file.txt` to `.tig/objects/58f3966...`
-    4. Create and store commit object: `8fb439...`
-    5. Set `.tig/master` to commit object
-
-== V4: Features
-
-  * Support for branching
-  * No merging
-
-=== Branches
-
-  * Only one branch so far: `master` 
-+
-------
-o---o---o---o---o master
-------
-+
-  * Each branch has it's own series of commits.
-+
-------
-o---o---o---o---o  master
-    \
-     ---o---o  2.0-dev
-------
-
-== Repository Format
-
-  * `.tig/refs/heads`: contains one file per branch
-  * Name of the file, corresponds to named of the branch
-  * Just like `master` contains the SHA1 of the latest commit in the branch
-
-  * `.tig/HEAD`:
-    - Contains SHA1 if checkout done by SHA1
-    - Contains the branch name if checkout done by branch name.
-      Example: `ref: refs/heads/master`
-
-------
-proj/
-  + .tig/
-  |  + objects/
-  |  | + 4c7be7b2c3641a5e489c4ce667699eeee4e994c9
-  |  | + ...
-  |  + refs/
-  |    + heads/
-  |      + master
-  |      + 2.0-dev
-  |  + HEAD
-  |
-  + file.txt
-------
-
-== Branch Operations
-
-  * Create Branch at commit 
-    1. Store commit SHA1 in `ref: refs/heads/master`
-
-  * Checkout
-    1. Determine the commit SHA1:
-       a. If SHA1 specified, use it.
-       b. *If branch specified, get SHA1 from `ref: refs/heads/your-branch`*
-    2. Get content SHA1 from commit object.
-    3. Copy it to `file.txt`
-    4. Set `HEAD`:
-       a. If checkout using SHA1, set to SHA1
-       b. *If checkout using branch name, set to `ref: refs/heads/your-branch`*
-
-  * Commit
-    1. *If `HEAD` does correspond to a branch, cannot commit*.
-    2. Find SHA1 of `file.txt`: `58f3966...`
-    3. Store `file.txt` to `.tig/objects/58f3966...`
-    4. Create and store commit object: `8fb439...`
-    5. Set `ref: refs/heads/your-branch` to commit object
-    
-== V5: Features
-
-  * Support for simple merge
-  * Merge conflicts not supported
+The link:docs/slides.asciidoc[] provide more information about the
+various revsions and how to build Git incrementally.
