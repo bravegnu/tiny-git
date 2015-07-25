@@ -73,10 +73,11 @@ proj/
 
 == DVCS and Seq. Versioning
 
-  * File is created called `file.txt.v1`
-  * User A takes a copy modifies it and creates `file.txt.v2`
-  * User B takes a copy modifies it differently and creates `file.txt.v2`
-  * Which is v2?
+  * Distributed versions control systems allows each user to create
+    commits, in their local repo.
++
+image::dvcs.png[]
++
   * Distributed version control system, sequential version no. does
     not work.
 
