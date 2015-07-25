@@ -39,7 +39,7 @@ Usage:
   tig log
   tig branch
   tig merge <branch>
------
+------
 
 == Slides: Building Git From Scratch
 
