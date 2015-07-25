@@ -19,8 +19,15 @@ Vijay Kumar <vijaykumar@bravegnu.org>
 
 == V0: The Skeleton
 
-  * Use docopt to parse the command line arguments.
-  * Usage information is used to parsing
+image::docs/docopt.png[]
+
+  * All command line tools need to parse arguments.
+  * Docopt considerably reduces the code for argument parsing.
+  * From the command help message, Docopt figures out
+    - sub-commands
+    - options
+    - positional arguments
+  * Provides parsed result in a dictionary.
 
 == V1: Features
 
