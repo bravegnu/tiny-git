@@ -155,15 +155,15 @@
     </dia:object>
     <dia:object type="Standard - Text" version="1" id="O2">
       <dia:attribute name="obj_pos">
-        <dia:point val="21,2"/>
+        <dia:point val="21.5,2"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="21,1.265;26.225,2.1875"/>
+        <dia:rectangle val="21.5,1.265;25.775,2.1875"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#file.txt.v1#</dia:string>
+            <dia:string>#4c7be7...#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="monospace" style="0" name="Courier"/>
@@ -172,7 +172,7 @@
             <dia:real val="0.98777778353455625"/>
           </dia:attribute>
           <dia:attribute name="pos">
-            <dia:point val="21,2"/>
+            <dia:point val="21.5,2"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>
@@ -319,12 +319,12 @@
         <dia:point val="14,8"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="14,7.265;19.225,8.1875"/>
+        <dia:rectangle val="14,7.265;18.275,8.1875"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#file.txt.v1#</dia:string>
+            <dia:string>#4c7be7...#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="monospace" style="0" name="Courier"/>
@@ -352,12 +352,12 @@
         <dia:point val="30,8"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="30,7.265;35.225,8.1875"/>
+        <dia:rectangle val="30,7.265;34.275,8.1875"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#file.txt.v1#</dia:string>
+            <dia:string>#4c7be7...#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="monospace" style="0" name="Courier"/>
@@ -385,12 +385,12 @@
         <dia:point val="14,13"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="14,12.265;19.225,13.1875"/>
+        <dia:rectangle val="14,12.265;18.275,13.1875"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#file.txt.v2#</dia:string>
+            <dia:string>#c9360f...#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="monospace" style="0" name="Courier"/>
@@ -418,12 +418,12 @@
         <dia:point val="30,13"/>
       </dia:attribute>
       <dia:attribute name="obj_bb">
-        <dia:rectangle val="30,12.265;35.225,13.1875"/>
+        <dia:rectangle val="30,12.265;34.275,13.1875"/>
       </dia:attribute>
       <dia:attribute name="text">
         <dia:composite type="text">
           <dia:attribute name="string">
-            <dia:string>#file.txt.v2#</dia:string>
+            <dia:string>#da39a3...#</dia:string>
           </dia:attribute>
           <dia:attribute name="font">
             <dia:font family="monospace" style="0" name="Courier"/>
@@ -584,41 +584,6 @@ change
           </dia:attribute>
           <dia:attribute name="pos">
             <dia:point val="23.5,0"/>
-          </dia:attribute>
-          <dia:attribute name="color">
-            <dia:color val="#000000"/>
-          </dia:attribute>
-          <dia:attribute name="alignment">
-            <dia:enum val="1"/>
-          </dia:attribute>
-        </dia:composite>
-      </dia:attribute>
-      <dia:attribute name="valign">
-        <dia:enum val="3"/>
-      </dia:attribute>
-    </dia:object>
-    <dia:object type="Standard - Text" version="1" id="O16">
-      <dia:attribute name="obj_pos">
-        <dia:point val="24,15"/>
-      </dia:attribute>
-      <dia:attribute name="obj_bb">
-        <dia:rectangle val="20.2125,14.265;27.7875,17.1631"/>
-      </dia:attribute>
-      <dia:attribute name="text">
-        <dia:composite type="text">
-          <dia:attribute name="string">
-            <dia:string>#Two files with
-different content
-called v2!#</dia:string>
-          </dia:attribute>
-          <dia:attribute name="font">
-            <dia:font family="sans" style="80" name="Helvetica-Bold"/>
-          </dia:attribute>
-          <dia:attribute name="height">
-            <dia:real val="0.98777778353455625"/>
-          </dia:attribute>
-          <dia:attribute name="pos">
-            <dia:point val="24,15"/>
           </dia:attribute>
           <dia:attribute name="color">
             <dia:color val="#000000"/>

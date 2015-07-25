@@ -1,6 +1,11 @@
 = Building Git From Scratch
 Vijay Kumar <vijaykumar@bravegnu.org>
 
+== Building Models
+
+image::catapult.jpg[align="left"]
+Source: https://www.eliwhitney.org/
+
 == Demo: Tiny Git
 
   * Creating a repository
@@ -73,20 +78,24 @@ proj/
 
 == DVCS and Seq. Versioning
 
+image::dvcs.png[]
+
   * Distributed versions control systems allows each user to create
     commits, in their local repo.
-+
-image::dvcs.png[]
-+
+
   * Distributed version control system, sequential version no. does
     not work.
 
 == Use SHA1 to Identify the File
 
-  * Indentify files by the SHA1 of their content.
-  * File is created called `4c7be7...`
-  * User A takes a copy modifies it and creates `c9360f...`
-  * User B takes a copy modifies it differently and creates `da39a3..`
+image::dvcs-sha1.png[]
+
+  * Idea: Use SHA1 sum of the content to identify the file.
+  * SHA1 is similar to checksum algorithms: but 20-bytes long
+  * Interesting property, no two files will have the same
+    checksum. (very low probability)
+  * Depicted as a 40 digit hex number: 4c7be7b2c3641a5e489c4ce667699eeee4e994c9
+  * Only first 6 digits are shown: 4c7be7...
 
 == How to store Files: Take 2
 
