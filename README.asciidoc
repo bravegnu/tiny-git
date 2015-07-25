@@ -11,7 +11,7 @@ Vijay Kumar <vijaykumar@bravegnu.org>
   * Switching branches
   * Merging changes from branches
 
-== Limitations
+=== Limitations
 
   * Tracks only a single file
   * Merge handling is not completely implemented
@@ -27,7 +27,13 @@ Vijay Kumar <vijaykumar@bravegnu.org>
   * Create Repo
   * Commit
   * Checkout
-  * No Branching
+  * Diff
+
+=== Limitations
+
+  * Checkout only latest revision
+  * No logs
+  * No branching
 
 == How to Store Files: Take 1
 
@@ -51,6 +57,8 @@ proj/
     2. Increment that by 1: 3 -> 4.
     3. Copy `file.txt` to `.tig/objects/file.txt.v4`
     4. Set `.tig/master` to `file.txt.v4`
+
+== How to Store Files: Take 1 (Contd.)
 
   * Checkout
     1. Get lastest revision from `.tig/master`
@@ -102,6 +110,19 @@ proj/
   * No meta information about the changes: who? why? when?
 +
 image::docs/no-commit-objects.png[]
+
+== V2: Features
+
+  * Create Repo
+  * Commit
+  * Checkout
+  * Diff
+  * Log
+
+=== Limitations
+
+  * Checkout only latest revision
+  * No branching
 
 == Ordering Regained
 
@@ -169,12 +190,12 @@ proj/
     4. Create and store commit object: `8fb439...`
     5. Set `.tig/master` to commit object
 
-== V2: Features
+== V3: Features
 
   * Support for branching
   * No merging
 
-== Branches
+=== Branches
 
   * Only one branch so far: `master` 
 +
